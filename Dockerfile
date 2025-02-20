@@ -11,18 +11,16 @@ RUN mkdir -p /data/scripts /data/plugins /data/world
 COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
 
-# Ensure online-mode is set correctly
-RUN echo "enforce-secure-profile=false" >> /data/server.properties
+# Copy SkinsRestorer plugin (if available)
+COPY --chown=1000:1000 plugins/SkinsRestorer.jar /data/plugins/SkinsRestorer.jar
 
-# Check if SkinsRestorer plugin exists before copying
-COPY plugins/SkinsRestorer.jar /tmp/SkinsRestorer.jar
-RUN test -f /tmp/SkinsRestorer.jar && mv /tmp/SkinsRestorer.jar /data/plugins/SkinsRestorer.jar || echo "SkinsRestorer.jar not found, skipping..."
-RUN chmod 755 /data/plugins/SkinsRestorer.jar || true
+# Set correct permissions for plugins
+RUN test -f /data/plugins/SkinsRestorer.jar && chmod 755 /data/plugins/SkinsRestorer.jar || true
 
-# Check if the world folder exists before copying
+# Copy the world folder (if available)
 COPY world /tmp/world
 RUN test -d /tmp/world && mv /tmp/world /data/world || echo "World folder not found, skipping..."
 RUN chmod -R 755 /data/world && chown -R 1000:1000 /data || true
 
-# Start backup script in the background and then start Minecraft
-CMD [ "sh", "-c", "nohup /data/scripts/backup_script.sh & exec /start" ]
+# Ensure online-mode is set correctly at runtime
+CMD [ "sh", "-c", "echo 'enforce-secure-profile=false' >> /data/server.properties && /data/scripts/backup_script.sh & exec /start" ]
