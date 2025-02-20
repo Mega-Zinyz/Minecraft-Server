@@ -27,6 +27,7 @@ RUN chmod -R 777 /data/world || true
 # Ensure server.properties is writable by everyone and add the secure profile setting
 RUN chmod 777 /data/server.properties || true
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties
+RUN echo 'online-mode=false' >> /data/server.properties
 
 # Copy the backup script and set proper permissions
 COPY backup_script.sh /data/scripts/backup_script.sh
