@@ -9,7 +9,7 @@ RUN mkdir -p /data/scripts /data/plugins /data/world
 
 # Copy backup_script.sh script and set permissions
 COPY backup_script.sh /data/scripts/backup_script.sh
-RUN chmod +x /data/scripts/backup.sh
+RUN chmod +x /data/scripts/backup_script.sh
 
 # Copy SkinsRestorer plugin
 COPY plugins/SkinsRestorer.jar /data/plugins/SkinsRestorer.jar
