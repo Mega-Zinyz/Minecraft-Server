@@ -1,5 +1,6 @@
 # Use itzg/minecraft-server as base image
 FROM itzg/minecraft-server
+VOLUME ["/data"]
 
 # Install Git for backups
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
