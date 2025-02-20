@@ -12,7 +12,7 @@ COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
 
 # Ensure online-mode is set correctly
-RUN echo "online-mode=false" >> /data/server.properties
+RUN echo "enforce-secure-profile=false" >> /data/server.properties
 
 # Check if SkinsRestorer plugin exists before copying
 COPY plugins/SkinsRestorer.jar /tmp/SkinsRestorer.jar
