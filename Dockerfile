@@ -11,6 +11,9 @@ RUN mkdir -p /data/scripts /data/plugins /data/world
 COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
 
+# Ensure online-mode is set correctly
+RUN echo "online-mode=false" >> /data/server.properties
+
 # Check if SkinsRestorer plugin exists before copying
 COPY plugins/SkinsRestorer.jar /tmp/SkinsRestorer.jar
 RUN test -f /tmp/SkinsRestorer.jar && mv /tmp/SkinsRestorer.jar /data/plugins/SkinsRestorer.jar || echo "SkinsRestorer.jar not found, skipping..."
