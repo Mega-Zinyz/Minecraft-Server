@@ -13,6 +13,9 @@ RUN mkdir -p /data/scripts /data/plugins /data/world
 # Copy SkinsRestorer plugin (if available)
 COPY --chown=1000:1000 plugins/SkinsRestorer.jar /data/plugins/SkinsRestorer.jar
 
+# Log the contents of the /data/plugins directory to verify
+RUN ls -l /data/plugins
+
 # Set correct permissions for plugins (give all users access)
 RUN test -f /data/plugins/SkinsRestorer.jar && chmod 777 /data/plugins/SkinsRestorer.jar || true
 
