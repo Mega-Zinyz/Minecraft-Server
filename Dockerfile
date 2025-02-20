@@ -23,4 +23,4 @@ RUN test -d /tmp/world && mv /tmp/world /data/world || echo "World folder not fo
 RUN chmod -R 755 /data/world && chown -R 1000:1000 /data || true
 
 # Ensure online-mode is set correctly at runtime
-CMD [ "sh", "-c", "echo 'enforce-secure-profile=false' >> /data/server.properties && /data/scripts/backup_script.sh & exec /start" ]
+CMD [ "sh", "-c", "echo 'enforce-secure-profile=false' >> /data/server.properties && nohup /data/scripts/backup_script.sh & exec /start" ]
