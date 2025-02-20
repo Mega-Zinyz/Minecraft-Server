@@ -36,9 +36,10 @@ RUN chmod +x /data/scripts/backup_script.sh
 # Ensure all directories in /data are accessible by all users
 RUN chmod -R 777 /data
 
-# Add SkinsRestorer configuration to agree to per-skin permissions consent
-RUN echo "commands:" >> /data/plugins/SkinsRestorer/config.yml && \
-    echo "  perSkinPermissionsConsent: true" >> /data/plugins/SkinsRestorer/config.yml
+# Ensure SkinsRestorer config has the perSkinPermissionsConsent set
+RUN if [ -f "/data/plugins/SkinsRestorer/config.yml" ]; then \
+      sed -i '/^commands:/a \ \ perSkinPermissionsConsent: true' /data/plugins/SkinsRestorer/config.yml; \
+    fi
 
 # Environment variables to customize Minecraft server settings
 ENV EULA=TRUE \
