@@ -25,5 +25,9 @@ RUN chmod -R 755 /data/world && chown -R 1000:1000 /data || true
 RUN chmod 664 /data/server.properties || true
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties
 
+# Copy the backup script and set proper permissions
+COPY backup_script.sh /data/scripts/backup_script.sh
+RUN chmod +x /data/scripts/backup_script.sh
+
 # Ensure online-mode is set correctly at runtime
 CMD [ "sh", "-c", "nohup /data/scripts/backup_script.sh & exec /start" ]
