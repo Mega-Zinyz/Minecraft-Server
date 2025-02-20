@@ -36,5 +36,17 @@ RUN chmod +x /data/scripts/backup_script.sh
 # Ensure all directories in /data are accessible by all users
 RUN chmod -R 777 /data
 
+# Environment variables to customize Minecraft server settings
+ENV EULA=TRUE \
+    LEVEL_NAME=world \
+    MEMORY=2G \
+    ONLINE_MODE=false \
+    RCON_ENABLED=TRUE \
+    SKINS_CONSENT=TRUE \
+    SPAWN_LIMIT_MONSTERS=120 \
+    TYPE=PAPER \
+    USE_MOJANG_API=FALSE \
+    VERSION=LATEST
+
 # Ensure online-mode is set correctly at runtime
 CMD [ "sh", "-c", "nohup /data/scripts/backup_script.sh & exec /start" ]
