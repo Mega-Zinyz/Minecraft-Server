@@ -13,21 +13,24 @@ RUN mkdir -p /data/scripts /data/plugins /data/world
 # Copy SkinsRestorer plugin (if available)
 COPY --chown=1000:1000 plugins/SkinsRestorer.jar /data/plugins/SkinsRestorer.jar
 
-# Set correct permissions for plugins
-RUN test -f /data/plugins/SkinsRestorer.jar && chmod 755 /data/plugins/SkinsRestorer.jar || true
+# Set correct permissions for plugins (give all users access)
+RUN test -f /data/plugins/SkinsRestorer.jar && chmod 777 /data/plugins/SkinsRestorer.jar || true
 
 # Copy the world folder (if available)
 COPY world /tmp/world
 RUN test -d /tmp/world && mv /tmp/world /data/world || echo "World folder not found, skipping..."
-RUN chmod -R 755 /data/world && chown -R 1000:1000 /data || true
+RUN chmod -R 777 /data/world || true
 
-# Ensure the server.properties is writable and add the secure profile setting
-RUN chmod 664 /data/server.properties || true
+# Ensure server.properties is writable by everyone and add the secure profile setting
+RUN chmod 777 /data/server.properties || true
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties
 
 # Copy the backup script and set proper permissions
 COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
+
+# Ensure all directories in /data are accessible by all users
+RUN chmod -R 777 /data
 
 # Ensure online-mode is set correctly at runtime
 CMD [ "sh", "-c", "nohup /data/scripts/backup_script.sh & exec /start" ]
