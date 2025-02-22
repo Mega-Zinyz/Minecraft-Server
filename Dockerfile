@@ -70,4 +70,4 @@ RUN chmod +x /data/scripts/backup_script.sh
 RUN chown 1000:1000 /data/scripts/backup_script.sh
 
 # Use your desired port directly in the startup command
-ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && /start --voice-chat-port 25565"]
+ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && /start --voice-chat-port 25565 --other-args"]
