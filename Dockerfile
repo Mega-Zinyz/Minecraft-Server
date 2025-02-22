@@ -1,7 +1,7 @@
-# Gunakan itzg/minecraft-server sebagai base image
+# Use itzg/minecraft-server as base image
 FROM itzg/minecraft-server
 
-# Install Git dan Rsync
+# Install Git and Rsync
 RUN apt-get update && apt-get install -y git rsync && rm -rf /var/lib/apt/lists/*
 
 # Clone world repository
@@ -9,18 +9,18 @@ RUN git clone https://github.com/Mega-Zinyz/Minecraft-World /tmp/world && \
     mkdir -p /data/world && \
     if [ -n "$(ls -A /tmp/world)" ]; then rsync -av /tmp/world/ /data/world/; fi && \
     chown -R 1000:1000 /data/world && \
-    chmod -R 777 /data/world  # 🔥 Memberikan akses penuh ke world folder
+    chmod -R 777 /data/world  # 🔥 Giving full access to world folder
 
-# Buat folder mods jika belum ada
+# Create mods folder if it doesn't exist
 RUN mkdir -p /data/mods /data/config /data/scripts
 RUN chown -R 1000:1000 /data
 
-# Copy semua file dari mods ke mods server
+# Copy all mods files to server's mods folder
 COPY --chown=1000:1000 mods/ /data/mods/
 RUN chmod -R 777 /data/world/serverconfig && chown -R 1000:1000 /data/world/serverconfig
 RUN mkdir -p /data/world/serverconfig && chown -R 1000:1000 /data/world
 
-# Pastikan permissions benar
+# Ensure permissions are correct
 RUN find /data/mods -type f -name "*.jar" -exec chmod 644 {} \;
 
 # **Fix Permissions for server.properties**
@@ -30,21 +30,23 @@ RUN ls -lah /data/server.properties  # Debugging
 RUN chmod -R 755 /data/config
 RUN chown -R 1000:1000 /data/config
 
-# Ensure the voicechat-server.properties is writable
-RUN chmod 777 /data/config/voicechat/voicechat-server.properties && \
+# Ensure the voicechat-server.properties and translations.properties exist and are writable
+RUN mkdir -p /data/config/voicechat && \
+    touch /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties && \
+    chmod 777 /data/config/voicechat/voicechat-server.properties && \
     chmod 777 /data/config/voicechat/translations.properties && \
     chown 1000:1000 /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties
 
-# Konfigurasi voicechat
+# Configure voicechat
 RUN echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
     echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
     echo "udp-proxy-port=-1" >> /data/config/voicechat/voicechat-server.properties
 
-# Konfigurasi server.properties
+# Configure server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
     echo 'online-mode=false' >> /data/server.properties
 
-# Set environment variables untuk server
+# Set environment variables for the server
 ENV EULA=TRUE \
     LEVEL_NAME=world \
     MEMORY=4G \
@@ -57,7 +59,7 @@ ENV EULA=TRUE \
     VERSION=LATEST \
     SERVER_PORT_UDP=-1
 
-# Copy backup script dan berikan izin eksekusi
+# Copy backup script and give execute permissions
 COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
 RUN chown 1000:1000 /data/scripts/backup_script.sh
