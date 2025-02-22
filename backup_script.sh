@@ -11,7 +11,7 @@ GITHUB_USER="$RAILWAY_GITHUB_USER"
 GITHUB_REPO="$RAILWAY_GITHUB_REPO"
 GITHUB_TOKEN="$RAILWAY_GITHUB_TOKEN"
 BACKUP_PATH="/data/world"
-REPO_PATH="/tmp/repo"
+REPO_PATH="/app/repo"  # 👈 Gunakan path yang aman dari volume Railway
 
 # Fungsi untuk menjalankan backup
 backup_world() {
@@ -21,8 +21,10 @@ backup_world() {
         # Hapus history Git lama agar tidak terjadi duplikasi data
         rm -rf "$BACKUP_PATH/.git"
 
-        # Hapus repo lama, lalu clone lagi
+        # Pastikan folder ada sebelum cloning
         rm -rf "$REPO_PATH"
+        mkdir -p "$REPO_PATH"
+
         echo "🔄 Cloning repository..."
         if ! git clone "https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git" "$REPO_PATH"; then
           echo "❌ Gagal meng-clone repository. Pastikan token memiliki izin push."
@@ -34,7 +36,7 @@ backup_world() {
         rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/world/"
 
         # Commit & push jika ada perubahan
-        cd "$REPO_PATH" || exit
+        cd "$REPO_PATH" || { echo "❌ Gagal mengakses $REPO_PATH"; exit 1; }
         git config user.name "Railway Backup Bot"
         git config user.email "backup-bot@railway.app"
 
@@ -55,8 +57,6 @@ backup_world() {
         fi
 
         echo "✅ Proses backup selesai. Menunggu 1 menit sebelum backup berikutnya..."
-        
-        # Tunggu 1 menit (60 detik) sebelum backup berikutnya
         sleep 60
     done
 }
