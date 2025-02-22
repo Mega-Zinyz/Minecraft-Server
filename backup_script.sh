@@ -37,13 +37,15 @@ backup_world() {
           git remote add origin "$REPO_URL"
           git fetch origin
 
-          # Gunakan branch `main`
+          # Paksa branch default menjadi `main`
           git checkout -b main || git checkout main
+          git branch --set-upstream-to=origin/main main
           git pull origin main || echo "⚠️ Tidak dapat menarik perubahan, mungkin branch kosong."
         else
           echo "🔄 Repository sudah ada, melakukan pull dari origin..."
           git pull --rebase origin main || echo "⚠️ Gagal melakukan rebase, mungkin branch kosong."
         fi
+
 
         # Commit & push jika ada perubahan
         git config user.name "Railway Backup Bot"
