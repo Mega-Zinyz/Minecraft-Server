@@ -17,6 +17,12 @@ REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 mkdir -p "$BACKUP_PATH"
 chmod -R 777 "$BACKUP_PATH"
 
+# Perbaiki kepemilikan jika diperlukan (Opsional, sesuaikan dengan user ID)
+chown -R 1000:1000 "$BACKUP_PATH"
+
+# Tandai folder sebagai direktori Git yang aman
+git config --global --add safe.directory "$BACKUP_PATH"
+
 # Fungsi untuk menjalankan backup
 backup_world() {
     while true; do
@@ -28,21 +34,11 @@ backup_world() {
         if [ ! -d ".git" ]; then
           echo "🔄 Repository belum ada, menginisialisasi Git..."
           git init
-
-          # Tambahkan remote jika belum ada
-          if ! git remote get-url origin > /dev/null 2>&1; then
-            git remote add origin "$REPO_URL"
-          fi
-
+          git remote add origin "$REPO_URL"
           git fetch origin
 
-          # Pastikan branch `main` ada
-          if git show-ref --verify --quiet refs/heads/main; then
-            git checkout main
-          else
-            git checkout -b main
-          fi
-
+          # Gunakan branch `main`
+          git checkout -b main || git checkout main
           git pull origin main || echo "⚠️ Tidak dapat menarik perubahan, mungkin branch kosong."
         else
           echo "🔄 Repository sudah ada, melakukan pull dari origin..."
