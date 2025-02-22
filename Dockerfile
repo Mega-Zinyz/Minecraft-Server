@@ -51,9 +51,5 @@ ENV EULA=TRUE \
     VERSION=LATEST \
     SERVER_PORT_UDP=24454
 
-# Copy backup script dan berikan izin eksekusi
-COPY backup_script.sh /data/scripts/backup_script.sh
-RUN chmod +x /data/scripts/backup_script.sh
-
-# **Fix backup issue - Prevent looping**
-ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
+# **Set entrypoint default ke Minecraft**
+ENTRYPOINT ["/start"]
