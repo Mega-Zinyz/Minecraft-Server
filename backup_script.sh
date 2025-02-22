@@ -42,7 +42,7 @@ backup_world() {
           git pull origin main || echo "⚠️ Tidak dapat menarik perubahan, mungkin branch kosong."
         else
           echo "🔄 Repository sudah ada, melakukan pull dari origin..."
-          git pull origin main || echo "⚠️ Tidak dapat menarik perubahan, mungkin branch kosong."
+          git pull --rebase origin main || echo "⚠️ Gagal melakukan rebase, mungkin branch kosong."
         fi
 
         # Commit & push jika ada perubahan
@@ -58,8 +58,9 @@ backup_world() {
           if git push origin main; then
             echo "✅ Backup berhasil di-push ke GitHub!"
           else
-            echo "❌ Gagal mengirim backup. Periksa koneksi atau izin repository."
-            exit 1
+            echo "❌ Gagal mengirim backup. Melakukan force push..."
+            git pull --rebase origin main
+            git push --force origin main && echo "✅ Backup berhasil di-push dengan force push!"
           fi
         else
           echo "ℹ️ Tidak ada perubahan di world folder. Backup tidak diperlukan."
