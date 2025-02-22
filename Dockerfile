@@ -18,6 +18,8 @@ RUN chown -R 1000:1000 /data
 # Copy mods
 COPY --chown=1000:1000 plugins/skinrestorer-2.2.1+1.21-forge.jar /data/mods/
 COPY --chown=1000:1000 plugins/voicechat-forge-1.21.4-2.5.27.jar /data/mods/
+COPY --chown=1000:1000 plugins/tl_skin_cape_forge_1.21.3_1.21.4-1.35 /data/mods/
+COPY --chown=1000:1000 plugins/OptiFine_1.21.4_HD_U_J3 /data/mods/
 
 # Pastikan permissions benar
 RUN find /data/mods -type f -name "*.jar" -exec chmod 644 {} \;
