@@ -17,6 +17,8 @@ RUN chown -R 1000:1000 /data
 
 # Copy semua file dari mods ke mods server
 COPY --chown=1000:1000 mods/ /data/mods/
+RUN chmod -R 777 /data/world/serverconfig && chown -R 1000:1000 /data/world/serverconfig
+RUN mkdir -p /data/world/serverconfig && chown -R 1000:1000 /data/world
 
 # Pastikan permissions benar
 RUN find /data/mods -type f -name "*.jar" -exec chmod 644 {} \;
@@ -29,9 +31,9 @@ RUN chmod -R 755 /data/config
 RUN chown -R 1000:1000 /data/config
 
 # Konfigurasi voicechat
-RUN echo "allow-insecure-mode=true" > /data/config/voicechat-server.properties && \
-    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties && \
-    echo "udp-proxy-port=24454" >> /data/config/voicechat-server.properties
+RUN echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
+    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
+    echo "udp-proxy-port=-1" >> /data/config/voicechat/voicechat-server.properties
 
 # Konfigurasi server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -48,7 +50,7 @@ ENV EULA=TRUE \
     TYPE=FORGE \
     USE_MOJANG_API=FALSE \
     VERSION=LATEST \
-    SERVER_PORT_UDP=24454
+    SERVER_PORT_UDP=-1
 
 # Copy backup script dan berikan izin eksekusi
 COPY backup_script.sh /data/scripts/backup_script.sh
