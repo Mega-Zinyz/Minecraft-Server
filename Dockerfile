@@ -4,6 +4,10 @@ FROM itzg/minecraft-server
 # Install Git dan Rsync
 RUN apt-get update && apt-get install -y git rsync && rm -rf /var/lib/apt/lists/*
 
+# Buat semua folder sebelum volume di-mount
+RUN mkdir -p /data/world /data/mods /data/config /data/scripts
+RUN mkdir -p /data/scripts
+
 # Clone world repository
 RUN git clone https://github.com/Mega-Zinyz/Minecraft-World /tmp/world && \
     rm -rf /tmp/world/.git && \
@@ -51,9 +55,9 @@ ENV EULA=TRUE \
     SERVER_PORT_UDP=24454
 
 # Copy backup script dan berikan izin eksekusi
-COPY backup_script.sh /app/scripts/backup_script.sh
-RUN chmod +x /app/scripts/backup_script.sh
-RUN chown 1000:1000 /app/scripts/backup_script.sh
+COPY backup_script.sh /data/scripts/backup_script.sh
+RUN chmod +x /data/scripts/backup_script.sh
+RUN chown 1000:1000 /data/scripts/backup_script.sh
 
 # **Fix backup issue - Prevent looping**
-ENTRYPOINT ["/bin/sh", "-c", "/app/scripts/backup_script.sh && exec /start"]
+ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
