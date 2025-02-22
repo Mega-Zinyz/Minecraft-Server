@@ -20,9 +20,9 @@ COPY --chown=1000:1000 plugins/voicechat-forge-1.21.4-2.5.27.jar /data/mods/
 
 # Pastikan voicechat config dibuat dengan benar
 RUN mkdir -p /data/config && \
-    echo "allow-insecure-mode=true" >> /data/config/voicechat-server.properties && \
+    echo "allow-insecure-mode=true" > /data/config/voicechat-server.properties && \
     echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties && \
-    echo "udp-proxy-port=25565" >> /data/config/voicechat-server.properties
+    echo "udp-proxy-port=24454" >> /data/config/voicechat-server.properties
 
 # Log isi folder mods untuk debugging
 RUN ls -lah /data/mods
@@ -31,10 +31,11 @@ RUN ls -lah /data/mods
 RUN chmod 644 /data/mods/*.jar
 
 # Pastikan server.properties bisa dibaca & ditulis oleh Minecraft server
-RUN touch /data/server.properties && chmod 666 /data/server.properties && chown 1000:1000 /data/server.properties
+RUN touch /data/server.properties && chmod 644 /data/server.properties && chown 1000:1000 /data/server.properties
 
 # Pastikan folder data memiliki akses yang benar
-RUN chmod -R 755 /data
+RUN mkdir -p /data/config && touch /data/config/fml.toml && chmod 644 /data/config/fml.toml
+RUN chown -R 1000:1000 /data/config && chmod -R 755 /data/config
 
 # Konfigurasi server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -56,6 +57,9 @@ ENV EULA=TRUE \
 # Copy dan atur script backup
 COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
+
+# Debugging: Cek izin file sebelum menjalankan server
+RUN ls -lah /data/config && ls -lah /data/
 
 # Jalankan server dengan backup script sebelum memulai Minecraft
 CMD ["sh", "-c", "/data/scripts/backup_script.sh & exec /start"]
