@@ -29,9 +29,12 @@ RUN chmod -R 755 /data/config
 RUN chown -R 1000:1000 /data/config
 
 # Konfigurasi voicechat
-RUN echo "allow-insecure-mode=true" > /data/config/voicechat-server.properties && \
-    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties && \
-    echo "udp-proxy-port=25565" >> /data/config/voicechat-server.properties
+RUN echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
+    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
+    echo "udp-proxy-port=25565" >> /data/config/voicechat/voicechat-server.properties
+
+# Debugging: Verify that the file is correct
+RUN cat /data/config/voicechat/voicechat-server.properties
 
 # Konfigurasi server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
