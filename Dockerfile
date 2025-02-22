@@ -37,10 +37,6 @@ RUN mkdir -p /data/config/voicechat && \
     chmod 777 /data/config/voicechat/translations.properties && \
     chown 1000:1000 /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties
 
-# Copy the update-voicechatport.sh script to the container
-COPY update-voicechatport.sh /data/scripts/update-voicechatport.sh
-RUN chmod +x /data/scripts/update-voicechatport.sh
-
 # Configure server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
     echo 'online-mode=false' >> /data/server.properties
@@ -66,4 +62,4 @@ RUN chmod +x /data/scripts/backup_script.sh
 RUN chown 1000:1000 /data/scripts/backup_script.sh
 
 # **Fix backup issue - Prevent looping**
-ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh&& /data/scripts/update-port.sh && exec /start"]
+ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
