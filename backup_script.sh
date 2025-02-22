@@ -10,14 +10,14 @@ fi
 GITHUB_USER="$RAILWAY_GITHUB_USER"
 GITHUB_REPO="$RAILWAY_GITHUB_REPO"
 GITHUB_TOKEN="$RAILWAY_GITHUB_TOKEN"
-BACKUP_PATH="/data/world"  # Gunakan world sebagai repo langsung
+BACKUP_PATH="/data/world"
 REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 
 # Pastikan folder world ada dan memiliki izin penuh
 mkdir -p "$BACKUP_PATH"
 chmod -R 777 "$BACKUP_PATH"
 
-# Perbaiki kepemilikan jika diperlukan (Opsional, sesuaikan dengan user ID)
+# Perbaiki kepemilikan jika diperlukan
 chown -R 1000:1000 "$BACKUP_PATH"
 
 # Tandai folder sebagai direktori Git yang aman
@@ -43,9 +43,16 @@ backup_world() {
           git pull origin main || echo "⚠️ Tidak dapat menarik perubahan, mungkin branch kosong."
         else
           echo "🔄 Repository sudah ada, melakukan pull dari origin..."
+
+          # Abort jika ada rebase yang gagal
+          git rebase --abort 2>/dev/null || true
+
+          # Reset ke versi terbaru dari origin/main untuk menghindari konflik
+          git fetch origin
+          git reset --hard origin/main
+          
           git pull --rebase origin main || echo "⚠️ Gagal melakukan rebase, mungkin branch kosong."
         fi
-
 
         # Commit & push jika ada perubahan
         git config user.name "Railway Backup Bot"
