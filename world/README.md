@@ -1,2 +1,0 @@
-# Minecraft-World
-Minecraft World
