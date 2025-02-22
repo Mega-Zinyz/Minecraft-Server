@@ -51,5 +51,8 @@ ENV EULA=TRUE \
     USE_MOJANG_API=FALSE \
     VERSION=LATEST
 
+COPY backup_script.sh /data/scripts/backup_script.sh
+RUN chmod +x /data/scripts/backup_script.sh
+
 # Jalankan server dengan backup script berjalan di background
 CMD [ "sh", "-c", "nohup /data/scripts/backup_script.sh & exec /start" ]
