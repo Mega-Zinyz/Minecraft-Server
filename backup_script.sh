@@ -25,15 +25,18 @@ backup_world() {
     while true; do
         echo "🕒 Memulai backup world..."
 
-        # Copy world ke dalam repo
+        # Copy isi world ke dalam repo
         echo "📂 Menyalin world data ke repository..."
         rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/"
 
-        # Commit & push jika ada perubahan
-        cd "$REPO_PATH" || exit
+        # Masuk ke direktori repo sebelum menjalankan Git
+        cd "$REPO_PATH" || { echo "❌ Gagal masuk ke repository."; exit 1; }
+
+        # Konfigurasi Git
         git config user.name "Railway Backup Bot"
         git config user.email "backup-bot@railway.app"
 
+        # Cek perubahan dan push
         if [ -n "$(git status --porcelain)" ]; then
             echo "📌 Perubahan terdeteksi, melakukan commit..."
             git add .
