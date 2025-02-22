@@ -34,6 +34,10 @@ RUN mkdir -p /data/config/voicechat && \
     echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
     echo "udp-proxy-port=25565" >> /data/config/voicechat/voicechat-server.properties
 
+# Ensure the voicechat config is writable
+RUN chmod -R 777 /data/config/voicechat && \
+    chown -R 1000:1000 /data/config/voicechat
+
 # Debugging: Verify that the file is correct
 RUN cat /data/config/voicechat/voicechat-server.properties
 

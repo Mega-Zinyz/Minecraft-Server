@@ -48,9 +48,15 @@ backup_world() {
         git config user.name "Railway Backup Bot"
         git config user.email "backup-bot@railway.app"
 
+        # Stash perubahan lokal sebelum menarik perubahan dari remote
+        git stash || echo "ℹ️ Tidak ada perubahan untuk di-stash."
+
         # Cek perubahan dan pull jika perlu
         echo "🔄 Mengambil perubahan dari remote repository..."
         git pull origin main --rebase || { echo "❌ Gagal mengambil perubahan."; exit 1; }
+
+        # Terapkan perubahan yang telah di-stash
+        git stash pop || echo "ℹ️ Tidak ada perubahan untuk dipulihkan."
 
         # Cek perubahan dan push
         if [ -n "$(git status --porcelain)" ]; then
