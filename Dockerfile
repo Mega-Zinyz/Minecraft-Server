@@ -31,7 +31,7 @@ RUN chown -R 1000:1000 /data/config
 # Konfigurasi voicechat
 RUN echo "allow-insecure-mode=true" > /data/config/voicechat-server.properties && \
     echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties && \
-    echo "udp-proxy-port=25565" >> /data/config/voicechat-server.properties
+    echo "udp-proxy-port=24454" >> /data/config/voicechat-server.properties
 
 # Konfigurasi server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -48,7 +48,7 @@ ENV EULA=TRUE \
     TYPE=FORGE \
     USE_MOJANG_API=FALSE \
     VERSION=LATEST \
-    SERVER_PORT_UDP=25565
+    SERVER_PORT_UDP=24454
 
 # Copy backup script dan berikan izin eksekusi
 COPY backup_script.sh /data/scripts/backup_script.sh
