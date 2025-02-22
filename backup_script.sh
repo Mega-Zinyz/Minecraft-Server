@@ -11,17 +11,17 @@ GITHUB_USER="$RAILWAY_GITHUB_USER"
 GITHUB_REPO="$RAILWAY_GITHUB_REPO"
 GITHUB_TOKEN="$RAILWAY_GITHUB_TOKEN"
 BACKUP_PATH="/data/world"
-REPO_PATH="/tmp/repo"
 REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 
-# Hapus repo lama jika ada, lalu clone ulang
-echo "🔄 Menghapus repository lama..."
-rm -rf "$REPO_PATH"
+# Pastikan /data/world adalah repository Git
+cd "$BACKUP_PATH" || { echo "❌ Gagal masuk ke $BACKUP_PATH"; exit 1; }
 
-echo "🔄 Meng-clone repository..."
-if ! git clone "$REPO_URL" "$REPO_PATH"; then
-  echo "❌ Gagal meng-clone repository. Periksa koneksi atau izin repository."
-  exit 1
+if [ ! -d ".git" ]; then
+    echo "⚠️ Folder /data/world bukan repository Git! Menginisialisasi ulang..."
+    git init
+    git remote add origin "$REPO_URL"
+    git fetch
+    git reset --hard origin/main || echo "ℹ️ Repo baru, tidak bisa reset ke origin/main."
 fi
 
 # Fungsi untuk menjalankan backup
@@ -29,18 +29,12 @@ backup_world() {
     while true; do
         echo "🕒 Memulai backup world..."
 
-        # Masuk ke dalam direktori repo
-        cd "$REPO_PATH" || { echo "❌ Gagal masuk ke repository."; exit 1; }
+        # Masuk ke dalam direktori world
+        cd "$BACKUP_PATH" || { echo "❌ Gagal masuk ke world folder."; exit 1; }
 
-        # Pastikan repository benar-benar valid
-        if [ ! -d ".git" ]; then
-            echo "❌ Tidak ada folder .git! Clone ulang mungkin gagal."
-            exit 1
-        fi
-
-        # Copy isi world langsung ke repo
+        # Copy world data ke dalam repository, kecuali folder .git
         echo "📂 Menyalin world data ke repository..."
-        rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/"
+        rsync -av --delete --exclude=".git" "$BACKUP_PATH/" "$BACKUP_PATH/"
 
         # Konfigurasi Git
         git config user.name "Railway Backup Bot"

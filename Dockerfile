@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y git rsync && rm -rf /var/lib/apt/lists/
 
 # Clone world repository
 RUN git clone https://github.com/Mega-Zinyz/Minecraft-World /tmp/world && \
-    rm -rf /tmp/world/.git && \
     mkdir -p /data/world && \
     if [ -n "$(ls -A /tmp/world)" ]; then rsync -av /tmp/world/ /data/world/; fi && \
     chown -R 1000:1000 /data/world && \
