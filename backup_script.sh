@@ -13,7 +13,8 @@ GITHUB_TOKEN="$RAILWAY_GITHUB_TOKEN"
 BACKUP_PATH="/data/world"  # Langsung gunakan world sebagai repo
 REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 
-# Pastikan folder world memiliki izin penuh
+# Pastikan folder world ada
+mkdir -p "$BACKUP_PATH"
 chmod -R 777 "$BACKUP_PATH"
 
 # Fungsi untuk menjalankan backup
@@ -21,18 +22,26 @@ backup_world() {
     while true; do
         echo "🕒 Memulai backup world..."
 
-        # Pastikan folder ada sebelum cloning
+        # Pastikan Git repository sudah ada
         if [ ! -d "$BACKUP_PATH/.git" ]; then
-          echo "🔄 Repository belum ada, meng-clone..."
-          rm -rf "$BACKUP_PATH"
-          git clone "$REPO_URL" "$BACKUP_PATH"
+          echo "🔄 Repository belum ada, meng-clone ke folder sementara..."
+          TMP_REPO="/tmp/repo"
+          rm -rf "$TMP_REPO"
+          git clone "$REPO_URL" "$TMP_REPO"
+
+          echo "🔄 Menyalin repository ke world tanpa menghapus data..."
+          rsync -av --ignore-existing "$TMP_REPO/" "$BACKUP_PATH/"
+          rm -rf "$TMP_REPO"
+
+          cd "$BACKUP_PATH" || { echo "❌ Gagal mengakses $BACKUP_PATH"; exit 1; }
+          git init
+          git remote add origin "$REPO_URL"
+          git fetch
+          git checkout -t origin/main || git checkout -b main
+        else
+          cd "$BACKUP_PATH" || { echo "❌ Gagal mengakses $BACKUP_PATH"; exit 1; }
+          git pull origin main
         fi
-
-        cd "$BACKUP_PATH" || { echo "❌ Gagal mengakses $BACKUP_PATH"; exit 1; }
-
-        # Pastikan branch menggunakan 'main'
-        git branch -M main
-        git pull origin main
 
         # Commit & push jika ada perubahan
         git config user.name "Railway Backup Bot"
