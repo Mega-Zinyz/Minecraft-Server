@@ -16,6 +16,9 @@ REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 # Pastikan /data/world adalah repository Git
 cd "$BACKUP_PATH" || { echo "❌ Gagal masuk ke $BACKUP_PATH"; exit 1; }
 
+# Tambahkan safe.directory untuk menghindari error kepemilikan mencurigakan
+git config --global --add safe.directory "$BACKUP_PATH"
+
 if [ ! -d ".git" ]; then
     echo "⚠️ Folder /data/world bukan repository Git! Menginisialisasi ulang..."
     git init
@@ -23,6 +26,7 @@ if [ ! -d ".git" ]; then
     git fetch
     git reset --hard origin/main || echo "ℹ️ Repo baru, tidak bisa reset ke origin/main."
 fi
+
 
 # Fungsi untuk menjalankan backup
 backup_world() {
