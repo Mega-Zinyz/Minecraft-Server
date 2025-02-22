@@ -9,7 +9,8 @@ RUN git clone https://github.com/Mega-Zinyz/Minecraft-World /tmp/world && \
     rm -rf /tmp/world/.git && \
     mkdir -p /data/world && \
     if [ -n "$(ls -A /tmp/world)" ]; then rsync -av /tmp/world/ /data/world/; fi && \
-    chown -R 1000:1000 /data/world
+    chown -R 1000:1000 /data/world && \
+    chmod -R 777 /data/world  # 🔥 Memberikan akses penuh ke world folder
 
 # Buat folder mods jika belum ada
 RUN mkdir -p /data/mods /data/config /data/scripts
