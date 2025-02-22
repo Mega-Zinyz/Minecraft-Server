@@ -54,10 +54,10 @@ backup_world() {
           echo "ℹ️ Tidak ada perubahan di world folder. Backup tidak diperlukan."
         fi
 
-        echo "✅ Proses backup selesai. Menunggu 15 menit sebelum backup berikutnya..."
+        echo "✅ Proses backup selesai. Menunggu 1 menit sebelum backup berikutnya..."
         
-        # Tunggu 15 menit (900 detik) sebelum backup berikutnya
-        sleep 900
+        # Tunggu 1 menit (60 detik) sebelum backup berikutnya
+        sleep 60
     done
 }
 
