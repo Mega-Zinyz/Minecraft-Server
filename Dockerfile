@@ -21,7 +21,10 @@ COPY --chown=1000:1000 plugins/voicechat-forge-1.21.4-2.5.27.jar /data/mods/
 
 # Pastikan permissions benar
 RUN find /data/mods -type f -name "*.jar" -exec chmod 644 {} \;
-RUN chmod 644 /data/server.properties
+
+# **Fix Error: Pastikan server.properties ada sebelum chmod**
+RUN touch /data/server.properties && chmod 644 /data/server.properties
+
 RUN chmod -R 755 /data/config
 RUN chown -R 1000:1000 /data/config
 
