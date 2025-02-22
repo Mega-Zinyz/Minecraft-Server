@@ -14,7 +14,7 @@ BACKUP_PATH="/data/world"
 REPO_PATH="/tmp/repo"
 REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 
-# Hapus repo lama jika ada, lalu clone ulang untuk memastikan Git aktif
+# Hapus repo lama jika ada, lalu clone ulang
 echo "🔄 Menghapus repository lama..."
 rm -rf "$REPO_PATH"
 
@@ -38,7 +38,7 @@ backup_world() {
             exit 1
         fi
 
-        # Copy world ke dalam repo
+        # Copy isi world langsung ke repo
         echo "📂 Menyalin world data ke repository..."
         rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/"
 
