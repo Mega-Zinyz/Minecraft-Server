@@ -1,57 +1,55 @@
-# Use itzg/minecraft-server as base image
+# Gunakan itzg/minecraft-server sebagai base image
 FROM itzg/minecraft-server
 
-# Install Git first
+# Install Git
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-# Clone the GitHub repository (replace with your repository)
+# Clone repository jika diperlukan
 RUN git clone https://github.com/Mega-Zinyz/Minecraft-Server /tmp/repo
 
-# Create necessary directories
-RUN mkdir -p /data/scripts /data/plugins /data/world
+# Copy Simple Voice Chat dan SkinsRestorer ke folder mods (karena pakai Forge)
+COPY --chown=1000:1000 plugins/skinrestorer-2.2.1+1.21-forge.jar /data/mods/skinrestorer-2.2.1+1.21-forge.jar
+COPY --chown=1000:1000 plugins/voicechat.jar /data/mods/voicechat.jar
 
-# Copy SkinsRestorer plugin (if available)
-COPY --chown=1000:1000 plugins/SkinsRestorer.jar /data/plugins/SkinsRestorer.jar
+# Log isi folder mods untuk verifikasi
+RUN ls -l /data/mods
 
-# Log the contents of the /data/plugins directory to verify
-RUN ls -l /data/plugins
+# Pastikan file mod memiliki izin yang benar
+RUN chmod 777 /data/mods/*.jar || true
 
-# Set correct permissions for plugins (give all users access)
-RUN test -f /data/plugins/SkinsRestorer.jar && chmod 777 /data/plugins/SkinsRestorer.jar || true
-
-# Copy the world folder (if available)
+# Copy world jika tersedia
 COPY world /tmp/world
 RUN test -d /tmp/world && mv /tmp/world /data/world || echo "World folder not found, skipping..."
 RUN chmod -R 777 /data/world || true
 
-# Ensure server.properties is writable by everyone and add the secure profile setting
+# Konfigurasi server.properties agar online-mode=false dan enforce-secure-profile=false
 RUN chmod 777 /data/server.properties || true
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties
 RUN echo 'online-mode=false' >> /data/server.properties
 
-# Copy the backup script and set proper permissions
+# Copy backup script dan atur izin eksekusi
 COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
 
-# Ensure all directories in /data are accessible by all users
+# Pastikan semua folder di /data bisa diakses
 RUN chmod -R 777 /data
 
-# Ensure SkinsRestorer config has the perSkinPermissionsConsent set
-RUN if [ -f "/data/plugins/SkinsRestorer/config.yml" ]; then \
-      sed -i '/^commands:/a \ \ perSkinPermissionsConsent: true' /data/plugins/SkinsRestorer/config.yml; \
+# Pastikan konfigurasi SkinsRestorer diatur dengan benar
+RUN if [ -f "/data/mods/skinrestorer-2.2.1+1.21-forge/config.yml" ]; then \
+      sed -i '/^commands:/a \ \ perSkinPermissionsConsent: true' /data/mods/skinrestorer-2.2.1+1.21-forge/config.yml; \
     fi
 
-# Environment variables to customize Minecraft server settings
+# Environment variables untuk konfigurasi server
 ENV EULA=TRUE \
     LEVEL_NAME=world \
-    MEMORY=2G \
+    MEMORY=4G \
     ONLINE_MODE=false \
     RCON_ENABLED=TRUE \
     SKINS_CONSENT=TRUE \
     SPAWN_LIMIT_MONSTERS=120 \
-    TYPE=PAPER \
+    TYPE=FORGE \
     USE_MOJANG_API=FALSE \
     VERSION=LATEST
 
-# Ensure online-mode is set correctly at runtime
+# Jalankan server dengan backup script berjalan di background
 CMD [ "sh", "-c", "nohup /data/scripts/backup_script.sh & exec /start" ]
