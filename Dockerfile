@@ -21,7 +21,8 @@ COPY --chown=1000:1000 plugins/voicechat-forge-1.21.4-2.5.27.jar /data/mods/
 # Pastikan voicechat config dibuat dengan benar
 RUN mkdir -p /data/config && \
     echo "allow-insecure-mode=true" >> /data/config/voicechat-server.properties && \
-    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties
+    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties && \
+    echo "udp-proxy-port=25565" >> /data/config/voicechat-server.properties
 
 # Log isi folder mods untuk debugging
 RUN ls -lah /data/mods
