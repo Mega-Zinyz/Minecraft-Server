@@ -40,7 +40,8 @@ RUN mkdir -p /data/config/voicechat && \
 # Configure voicechat
 RUN echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
     echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
-    echo "udp-proxy-port=25565" >> /data/config/voicechat/voicechat-server.properties
+    echo "udp-proxy-port=24454" >> /data/config/voicechat/voicechat-server.properties && \
+    echo "Voice Chat UDP Port: 24454"  # Echo UDP port in logs
 
 # Configure server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -57,7 +58,10 @@ ENV EULA=TRUE \
     TYPE=FORGE \
     USE_MOJANG_API=FALSE \
     VERSION=LATEST \
-    SERVER_PORT_UDP=25565
+    SERVER_PORT_UDP=24454
+
+# Echo the UDP port in the logs when the server starts
+RUN echo "Server UDP Port for Voice Chat: $SERVER_PORT_UDP"  # This will echo the UDP port in logs
 
 # Copy backup script and give execute permissions
 COPY backup_script.sh /data/scripts/backup_script.sh
