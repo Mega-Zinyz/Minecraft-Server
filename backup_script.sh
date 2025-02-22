@@ -48,6 +48,10 @@ backup_world() {
         git config user.name "Railway Backup Bot"
         git config user.email "backup-bot@railway.app"
 
+        # Cek perubahan dan pull jika perlu
+        echo "🔄 Mengambil perubahan dari remote repository..."
+        git pull origin main --rebase || { echo "❌ Gagal mengambil perubahan."; exit 1; }
+
         # Cek perubahan dan push
         if [ -n "$(git status --porcelain)" ]; then
             echo "📌 Perubahan terdeteksi, melakukan commit..."
