@@ -40,7 +40,7 @@ backup_world() {
 
         # Copy world ke dalam repo
         echo "📂 Menyalin world data ke repository..."
-        rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/world/"
+        rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/"
 
         # Konfigurasi Git
         git config user.name "Railway Backup Bot"
