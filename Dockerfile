@@ -51,9 +51,9 @@ ENV EULA=TRUE \
     SERVER_PORT_UDP=24454
 
 # Copy backup script dan berikan izin eksekusi
-COPY backup_script.sh /data/scripts/backup_script.sh
-RUN chmod +x /data/scripts/backup_script.sh
-RUN chown 1000:1000 /data/scripts/backup_script.sh
+COPY backup_script.sh /app/scripts/backup_script.sh
+RUN chmod +x /app/scripts/backup_script.sh
+RUN chown 1000:1000 /app/scripts/backup_script.sh
 
 # **Fix backup issue - Prevent looping**
-ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
+ENTRYPOINT ["/bin/sh", "-c", "/app/scripts/backup_script.sh && exec /start"]
