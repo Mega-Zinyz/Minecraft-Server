@@ -29,7 +29,7 @@ RUN ls -lah /data/mods
 
 # Pastikan permissions benar (LEBIH AMAN)
 RUN chmod 644 /data/mods/*.jar
-RUN chmod 644 /data/server.properties
+RUN touch /data/server.properties && chmod 644 /data/server.properties
 RUN chmod -R 755 /data/config
 
 # Konfigurasi server.properties
