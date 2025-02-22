@@ -13,47 +13,56 @@ GITHUB_TOKEN="$RAILWAY_GITHUB_TOKEN"
 BACKUP_PATH="/data/world"
 REPO_PATH="/tmp/repo"
 
-while true; do
-    echo "🕒 Memulai backup world..."
-    
-    # Hapus history Git lama agar tidak terjadi duplikasi data
-    rm -rf "$BACKUP_PATH/.git"
+# Fungsi untuk menjalankan backup
+backup_world() {
+    while true; do
+        echo "🕒 Memulai backup world..."
 
-    # Hapus repo lama, lalu clone lagi
-    rm -rf "$REPO_PATH"
-    echo "🔄 Cloning repository..."
-    if ! git clone "https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git" "$REPO_PATH"; then
-      echo "❌ Gagal meng-clone repository. Pastikan token memiliki izin push."
-      exit 1
-    fi
+        # Hapus history Git lama agar tidak terjadi duplikasi data
+        rm -rf "$BACKUP_PATH/.git"
 
-    # Copy world folder ke dalam repo menggunakan rsync
-    echo "📂 Menyalin world data ke repository..."
-    rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/world/"
+        # Hapus repo lama, lalu clone lagi
+        rm -rf "$REPO_PATH"
+        echo "🔄 Cloning repository..."
+        if ! git clone "https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git" "$REPO_PATH"; then
+          echo "❌ Gagal meng-clone repository. Pastikan token memiliki izin push."
+          exit 1
+        fi
 
-    # Commit & push jika ada perubahan
-    cd "$REPO_PATH" || exit
-    git config user.name "Railway Backup Bot"
-    git config user.email "backup-bot@railway.app"
+        # Copy world folder ke dalam repo menggunakan rsync
+        echo "📂 Menyalin world data ke repository..."
+        rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/world/"
 
-    if [ -n "$(git status --porcelain)" ]; then
-      echo "📌 Perubahan terdeteksi, melakukan commit..."
-      git add .
-      git commit -m "🚀 Automated backup: $(date +'%Y-%m-%d %H:%M:%S')"
+        # Commit & push jika ada perubahan
+        cd "$REPO_PATH" || exit
+        git config user.name "Railway Backup Bot"
+        git config user.email "backup-bot@railway.app"
 
-      echo "📤 Mengirim backup ke GitHub..."
-      if git push origin main; then
-        echo "✅ Backup berhasil di-push ke GitHub!"
-      else
-        echo "❌ Gagal mengirim backup. Periksa koneksi atau izin repository."
-        exit 1
-      fi
-    else
-      echo "ℹ️ Tidak ada perubahan di world folder. Backup tidak diperlukan."
-    fi
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "📌 Perubahan terdeteksi, melakukan commit..."
+          git add .
+          git commit -m "🚀 Automated backup: $(date +'%Y-%m-%d %H:%M:%S')"
 
-    echo "✅ Proses backup selesai. Menunggu 1 jam sebelum backup berikutnya..."
-    
-    # Tunggu 1 jam (3600 detik)
-    sleep 3600
-done
+          echo "📤 Mengirim backup ke GitHub..."
+          if git push origin main; then
+            echo "✅ Backup berhasil di-push ke GitHub!"
+          else
+            echo "❌ Gagal mengirim backup. Periksa koneksi atau izin repository."
+            exit 1
+          fi
+        else
+          echo "ℹ️ Tidak ada perubahan di world folder. Backup tidak diperlukan."
+        fi
+
+        echo "✅ Proses backup selesai. Menunggu 1 jam sebelum backup berikutnya..."
+        
+        # Tunggu 1 jam (3600 detik) sebelum backup berikutnya
+        sleep 3600
+    done
+}
+
+# Jalankan backup di background
+backup_world &
+
+# Mulai server Minecraft
+exec /start
