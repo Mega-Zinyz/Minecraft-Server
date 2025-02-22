@@ -11,7 +11,7 @@ GITHUB_USER="$RAILWAY_GITHUB_USER"
 GITHUB_REPO="$RAILWAY_GITHUB_REPO"
 GITHUB_TOKEN="$RAILWAY_GITHUB_TOKEN"
 BACKUP_PATH="/data/world"
-REPO_URL="https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
+REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 
 # Pastikan /data/world adalah repository Git
 cd "$BACKUP_PATH" || { echo "❌ Gagal masuk ke $BACKUP_PATH"; exit 1; }
@@ -23,10 +23,14 @@ if [ ! -d ".git" ]; then
     echo "⚠️ Folder /data/world bukan repository Git! Menginisialisasi ulang..."
     git init
     git remote add origin "$REPO_URL"
-    git remote set-url origin "$REPO_URL"  # 🔥 Fix autentikasi GitHub
     git fetch origin main || echo "ℹ️ Repo baru, tidak bisa fetch."
     git reset --hard origin/main || echo "ℹ️ Repo baru, tidak bisa reset ke origin/main."
 fi
+
+# 🔥 Set Git Credential Helper agar tidak meminta username/password
+git config --global credential.helper store
+echo "https://${GITHUB_TOKEN}:x-oauth-basic@github.com" > ~/.git-credentials
+chmod 600 ~/.git-credentials
 
 # Fungsi untuk menjalankan backup
 backup_world() {
