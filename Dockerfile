@@ -4,11 +4,12 @@ FROM itzg/minecraft-server
 # Install Git
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-# Clone world repository and move to data/world
+# Clone world repository
 RUN git clone https://github.com/Mega-Zinyz/Minecraft-World /tmp/world && \
-    rm -rf /tmp/world/ && \
+    rm -rf /tmp/world/.git && \
+    ls -lah /tmp/world && \
     mkdir -p /data/world && \
-    mv /tmp/world/* /data/world && \
+    cp -r /tmp/world/* /data/world/ || echo "World folder is empty, skipping..." && \
     chown -R 1000:1000 /data/world  # Ensure correct ownership
 
 # Copy Simple Voice Chat and SkinsRestorer to Forge mods folder
