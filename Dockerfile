@@ -53,7 +53,7 @@ ENV EULA=TRUE \
 
 # Copy backup script dan berikan izin eksekusi
 COPY backup_script.sh /data/scripts/backup_script.sh
-RUN chmod +x /data/scripts/backup_script.sh
+RUN chown 1000:1000 /data/scripts/backup_script.sh
 
 # **Fix backup issue - Prevent looping**
 ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
