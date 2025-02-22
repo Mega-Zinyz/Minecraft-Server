@@ -37,11 +37,9 @@ RUN mkdir -p /data/config/voicechat && \
     chmod 777 /data/config/voicechat/translations.properties && \
     chown 1000:1000 /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties
 
-# Configure voicechat
-RUN echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
-    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
-    echo "udp-proxy-port=24454" >> /data/config/voicechat/voicechat-server.properties && \
-    echo "Voice Chat UDP Port: 24454"  # Echo UDP port in logs
+# Copy the update-voicechatport.sh script to the container
+COPY update-port.sh /data/scripts/update-voicechatport.sh
+RUN chmod +x /data/scripts/update-voicechatport.sh
 
 # Configure server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -51,14 +49,13 @@ RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
 ENV EULA=TRUE \
     LEVEL_NAME=world \
     MEMORY=4G \
-    ONLINE_MODE=false \
+    ONLINE_MODE=FALSE \
     RCON_ENABLED=TRUE \
     SKINS_CONSENT=TRUE \
     SPAWN_LIMIT_MONSTERS=120 \
     TYPE=FORGE \
     USE_MOJANG_API=FALSE \
-    VERSION=LATEST \
-    SERVER_PORT_UDP=24454
+    VERSION=LATEST 
 
 # Echo the UDP port in the logs when the server starts
 RUN echo "Server UDP Port for Voice Chat: $SERVER_PORT_UDP"  # This will echo the UDP port in logs
@@ -69,4 +66,4 @@ RUN chmod +x /data/scripts/backup_script.sh
 RUN chown 1000:1000 /data/scripts/backup_script.sh
 
 # **Fix backup issue - Prevent looping**
-ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
+ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh&& /data/scripts/update-port.sh && exec /start"]
