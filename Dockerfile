@@ -29,8 +29,12 @@ RUN ls -lah /data/mods
 
 # Pastikan permissions benar (LEBIH AMAN)
 RUN chmod 644 /data/mods/*.jar
-RUN touch /data/server.properties && chmod 644 /data/server.properties
-RUN chmod -R 755 /data/config
+
+# Pastikan server.properties bisa dibaca & ditulis oleh Minecraft server
+RUN touch /data/server.properties && chmod 666 /data/server.properties && chown 1000:1000 /data/server.properties
+
+# Pastikan folder data memiliki akses yang benar
+RUN chmod -R 755 /data
 
 # Konfigurasi server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
