@@ -6,7 +6,7 @@ services:
     container_name: minecraft_server
     ports:
       - "25565:25565"    # Port Minecraft
-      - "24454:24454/udp" # Port Proximity Chat (Simple Voice Chat)
+      - "25565:25565/udp" # Port Proximity Chat (Simple Voice Chat)
     volumes:
       - ./data:/data
     environment:

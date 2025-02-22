@@ -29,17 +29,9 @@ RUN chmod -R 755 /data/config
 RUN chown -R 1000:1000 /data/config
 
 # Konfigurasi voicechat
-RUN mkdir -p /data/config/voicechat && \
-    echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
-    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
-    echo "udp-proxy-port=52446" >> /data/config/voicechat/voicechat-server.properties
-
-# Ensure the voicechat config is writable
-RUN chmod -R 777 /data/config/voicechat && \
-    chown -R 1000:1000 /data/config/voicechat
-
-# Debugging: Verify that the file is correct
-RUN cat /data/config/voicechat/voicechat-server.properties
+RUN echo "allow-insecure-mode=true" > /data/config/voicechat-server.properties && \
+    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties && \
+    echo "udp-proxy-port=25565" >> /data/config/voicechat-server.properties
 
 # Konfigurasi server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -56,7 +48,7 @@ ENV EULA=TRUE \
     TYPE=FORGE \
     USE_MOJANG_API=FALSE \
     VERSION=LATEST \
-    SERVER_PORT_UDP=52446
+    SERVER_PORT_UDP=25565
 
 # Copy backup script dan berikan izin eksekusi
 COPY backup_script.sh /data/scripts/backup_script.sh
