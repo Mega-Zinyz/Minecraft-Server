@@ -38,7 +38,7 @@ RUN mkdir -p /data/config/voicechat && \
     chown 1000:1000 /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties
 
 # Copy the update-voicechatport.sh script to the container
-COPY update-port.sh /data/scripts/update-voicechatport.sh
+COPY update-voicechatport.sh /data/scripts/update-voicechatport.sh
 RUN chmod +x /data/scripts/update-voicechatport.sh
 
 # Configure server.properties
