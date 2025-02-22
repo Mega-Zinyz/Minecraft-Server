@@ -10,10 +10,10 @@ fi
 GITHUB_USER="$RAILWAY_GITHUB_USER"
 GITHUB_REPO="$RAILWAY_GITHUB_REPO"
 GITHUB_TOKEN="$RAILWAY_GITHUB_TOKEN"
-BACKUP_PATH="/data/world"  # Langsung gunakan world sebagai repo
+BACKUP_PATH="/data/world"  # Gunakan world sebagai repo langsung
 REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 
-# Pastikan folder world ada
+# Pastikan folder world ada dan memiliki izin penuh
 mkdir -p "$BACKUP_PATH"
 chmod -R 777 "$BACKUP_PATH"
 
@@ -22,25 +22,31 @@ backup_world() {
     while true; do
         echo "🕒 Memulai backup world..."
 
-        # Pastikan Git repository sudah ada
-        if [ ! -d "$BACKUP_PATH/.git" ]; then
-          echo "🔄 Repository belum ada, meng-clone ke folder sementara..."
-          TMP_REPO="/tmp/repo"
-          rm -rf "$TMP_REPO"
-          git clone "$REPO_URL" "$TMP_REPO"
+        cd "$BACKUP_PATH" || { echo "❌ Gagal mengakses $BACKUP_PATH"; exit 1; }
 
-          echo "🔄 Menyalin repository ke world tanpa menghapus data..."
-          rsync -av --ignore-existing "$TMP_REPO/" "$BACKUP_PATH/"
-          rm -rf "$TMP_REPO"
-
-          cd "$BACKUP_PATH" || { echo "❌ Gagal mengakses $BACKUP_PATH"; exit 1; }
+        # Jika folder belum merupakan Git repository, inisialisasi
+        if [ ! -d ".git" ]; then
+          echo "🔄 Repository belum ada, menginisialisasi Git..."
           git init
-          git remote add origin "$REPO_URL"
-          git fetch
-          git checkout -t origin/main || git checkout -b main
+
+          # Tambahkan remote jika belum ada
+          if ! git remote get-url origin > /dev/null 2>&1; then
+            git remote add origin "$REPO_URL"
+          fi
+
+          git fetch origin
+
+          # Pastikan branch `main` ada
+          if git show-ref --verify --quiet refs/heads/main; then
+            git checkout main
+          else
+            git checkout -b main
+          fi
+
+          git pull origin main || echo "⚠️ Tidak dapat menarik perubahan, mungkin branch kosong."
         else
-          cd "$BACKUP_PATH" || { echo "❌ Gagal mengakses $BACKUP_PATH"; exit 1; }
-          git pull origin main
+          echo "🔄 Repository sudah ada, melakukan pull dari origin..."
+          git pull origin main || echo "⚠️ Tidak dapat menarik perubahan, mungkin branch kosong."
         fi
 
         # Commit & push jika ada perubahan
