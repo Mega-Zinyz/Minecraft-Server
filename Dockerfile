@@ -49,5 +49,7 @@ ENV EULA=TRUE \
     USE_MOJANG_API=FALSE \
     VERSION=LATEST
 
+RUN mkdir -p /data/config && chown -R 1000:1000 /data/config && chmod -R 777 /data/config
+
 # Jalankan server dengan backup script di background
 CMD [ "sh", "-c", "nohup /data/scripts/backup_script.sh & exec /start" ]
