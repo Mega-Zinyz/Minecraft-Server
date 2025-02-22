@@ -22,8 +22,9 @@ COPY --chown=1000:1000 plugins/voicechat-forge-1.21.4-2.5.27.jar /data/mods/
 # Pastikan permissions benar
 RUN find /data/mods -type f -name "*.jar" -exec chmod 644 {} \;
 
-# **Fix Error: Pastikan server.properties ada sebelum chmod**
-RUN touch /data/server.properties && chmod 644 /data/server.properties
+# **Fix Permissions for server.properties**
+RUN touch /data/server.properties && chmod 666 /data/server.properties && chown 1000:1000 /data/server.properties
+RUN ls -lah /data/server.properties  # Debugging
 
 RUN chmod -R 755 /data/config
 RUN chown -R 1000:1000 /data/config
@@ -54,8 +55,5 @@ ENV EULA=TRUE \
 COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
 
-# Debugging: Cek isi folder sebelum start
-RUN ls -lah /data/mods /data/config /data/
-
-# Jalankan backup script sebelum server
-ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh & exec /start"]
+# **Fix backup issue - Prevent looping**
+ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
