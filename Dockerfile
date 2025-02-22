@@ -40,7 +40,7 @@ RUN mkdir -p /data/config/voicechat && \
 # Configure voicechat
 RUN echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
     echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
-    echo "udp-proxy-port=-1" >> /data/config/voicechat/voicechat-server.properties
+    echo "udp-proxy-port=25565" >> /data/config/voicechat/voicechat-server.properties
 
 # Configure server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -57,7 +57,7 @@ ENV EULA=TRUE \
     TYPE=FORGE \
     USE_MOJANG_API=FALSE \
     VERSION=LATEST \
-    SERVER_PORT_UDP=-1
+    SERVER_PORT_UDP=25565
 
 # Copy backup script and give execute permissions
 COPY backup_script.sh /data/scripts/backup_script.sh
