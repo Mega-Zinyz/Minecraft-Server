@@ -9,7 +9,7 @@ RUN git clone https://github.com/Mega-Zinyz/Minecraft-Server /tmp/repo
 
 # Copy Simple Voice Chat dan SkinsRestorer ke folder mods (karena pakai Forge)
 COPY --chown=1000:1000 plugins/skinrestorer-2.2.1+1.21-forge.jar /data/mods/skinrestorer-2.2.1+1.21-forge.jar
-COPY --chown=1000:1000 plugins/voicechat.jar /data/mods/voicechat.jar
+COPY --chown=1000:1000 plugins/voicechat-forge-1.21.4-2.5.27.jar /data/mods/voicechat-forge-1.21.4-2.5.27.jar
 
 # Log isi folder mods untuk verifikasi
 RUN ls -l /data/mods
