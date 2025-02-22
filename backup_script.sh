@@ -14,10 +14,14 @@ BACKUP_PATH="/data/world"
 REPO_PATH="/tmp/repo"
 REPO_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${GITHUB_REPO}.git"
 
-# Pastikan /tmp/repo ada, jika tidak clone dulu
-if [ ! -d "$REPO_PATH/.git" ]; then
-    echo "🔄 Repository belum ada, meng-clone..."
-    git clone "$REPO_URL" "$REPO_PATH" || { echo "❌ Gagal meng-clone repository."; exit 1; }
+# Hapus repo lama jika ada, lalu clone ulang untuk memastikan Git aktif
+echo "🔄 Menghapus repository lama..."
+rm -rf "$REPO_PATH"
+
+echo "🔄 Meng-clone repository..."
+if ! git clone "$REPO_URL" "$REPO_PATH"; then
+  echo "❌ Gagal meng-clone repository. Periksa koneksi atau izin repository."
+  exit 1
 fi
 
 # Fungsi untuk menjalankan backup
@@ -25,12 +29,18 @@ backup_world() {
     while true; do
         echo "🕒 Memulai backup world..."
 
-        # Copy isi world ke dalam repo
-        echo "📂 Menyalin world data ke repository..."
-        rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/"
-
-        # Masuk ke direktori repo sebelum menjalankan Git
+        # Masuk ke dalam direktori repo
         cd "$REPO_PATH" || { echo "❌ Gagal masuk ke repository."; exit 1; }
+
+        # Pastikan repository benar-benar valid
+        if [ ! -d ".git" ]; then
+            echo "❌ Tidak ada folder .git! Clone ulang mungkin gagal."
+            exit 1
+        fi
+
+        # Copy world ke dalam repo
+        echo "📂 Menyalin world data ke repository..."
+        rsync -av --delete "$BACKUP_PATH/" "$REPO_PATH/world/"
 
         # Konfigurasi Git
         git config user.name "Railway Backup Bot"
