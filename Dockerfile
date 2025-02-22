@@ -20,22 +20,20 @@ COPY --chown=1000:1000 plugins/voicechat-forge-1.21.4-2.5.27.jar /data/mods/
 
 # Pastikan voicechat config dibuat dengan benar
 RUN mkdir -p /data/config && \
-    echo "allow-insecure-mode=true" >> /data/config/voicechat-server.properties
+    echo "allow-insecure-mode=true" >> /data/config/voicechat-server.properties && \
+    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties
 
 # Log isi folder mods untuk debugging
 RUN ls -lah /data/mods
 
-# Pastikan permissions benar
-RUN chmod 777 /data/mods/*.jar || true
+# Pastikan permissions benar (LEBIH AMAN)
+RUN chmod 644 /data/mods/*.jar
+RUN chmod 644 /data/server.properties
+RUN chmod -R 755 /data/config
 
 # Konfigurasi server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
-    echo 'online-mode=false' >> /data/server.properties && \
-    chmod 777 /data/server.properties || true
-
-# Copy dan atur script backup
-COPY backup_script.sh /data/scripts/backup_script.sh
-RUN chmod +x /data/scripts/backup_script.sh
+    echo 'online-mode=false' >> /data/server.properties
 
 # Set environment variables untuk server
 ENV EULA=TRUE \
@@ -47,9 +45,12 @@ ENV EULA=TRUE \
     SPAWN_LIMIT_MONSTERS=120 \
     TYPE=FORGE \
     USE_MOJANG_API=FALSE \
-    VERSION=LATEST
+    VERSION=LATEST \
+    SERVER_PORT_UDP=24454
 
-RUN mkdir -p /data/config && chown -R 1000:1000 /data/config && chmod -R 777 /data/config
+# Copy dan atur script backup
+COPY backup_script.sh /data/scripts/backup_script.sh
+RUN chmod +x /data/scripts/backup_script.sh
 
-# Jalankan server dengan backup script di background
-CMD [ "sh", "-c", "nohup /data/scripts/backup_script.sh & exec /start" ]
+# Jalankan server dengan backup script sebelum memulai Minecraft
+CMD ["sh", "-c", "/data/scripts/backup_script.sh & exec /start"]
