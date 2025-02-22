@@ -30,9 +30,18 @@ RUN ls -lah /data/server.properties  # Debugging
 RUN chmod -R 755 /data/config
 RUN chown -R 1000:1000 /data/config
 
-# Copy the startup script to the container
-COPY startup.sh /data/scripts/startup.sh
-RUN chmod +x /data/scripts/startup.sh
+# Ensure the voicechat-server.properties and translations.properties exist and are writable
+RUN mkdir -p /data/config/voicechat && \
+    touch /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties && \
+    chmod 777 /data/config/voicechat/voicechat-server.properties && \
+    chmod 777 /data/config/voicechat/translations.properties && \
+    chown 1000:1000 /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties
+
+# **Fix the voice chat port**
+RUN sed -i 's/^voice_host=.*$/voice_host=25565/' /data/config/voicechat/voicechat-server.properties
+
+# Debugging: Check if the port change is successful
+RUN cat /data/config/voicechat/voicechat-server.properties
 
 # Configure server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -59,4 +68,4 @@ RUN chmod +x /data/scripts/backup_script.sh
 RUN chown 1000:1000 /data/scripts/backup_script.sh
 
 # **Fix backup issue - Prevent looping**
-ENTRYPOINT ["/data/scripts/startup.sh"]
+ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
