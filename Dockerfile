@@ -37,6 +37,11 @@ RUN mkdir -p /data/config/voicechat && \
     chmod 777 /data/config/voicechat/translations.properties && \
     chown 1000:1000 /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties
 
+# Configure voicechat
+RUN echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
+    echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
+    sed -i "s/^udp-proxy-port=.*/udp-proxy-port=25565/" /data/config/voicechat/voicechat-server.properties
+
 # Configure server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
     echo 'online-mode=false' >> /data/server.properties
