@@ -30,6 +30,11 @@ RUN ls -lah /data/server.properties  # Debugging
 RUN chmod -R 755 /data/config
 RUN chown -R 1000:1000 /data/config
 
+# Ensure the voicechat-server.properties is writable
+RUN chmod 666 /data/config/voicechat/voicechat-server.properties && \
+    chmod 666 /data/config/voicechat/translations.properties && \
+    chown 1000:1000 /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties
+
 # Konfigurasi voicechat
 RUN echo "allow-insecure-mode=true" > /data/config/voicechat/voicechat-server.properties && \
     echo "use-experimental-udp-proxy=true" >> /data/config/voicechat/voicechat-server.properties && \
