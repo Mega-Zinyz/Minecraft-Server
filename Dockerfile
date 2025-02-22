@@ -1,8 +1,8 @@
 # Use itzg/minecraft-server as base image
 FROM itzg/minecraft-server
 
-# Install Git, Rsync, and socat for UDP proxy
-RUN apt-get update && apt-get install -y git rsync socat && rm -rf /var/lib/apt/lists/*
+# Install Git and Rsync
+RUN apt-get update && apt-get install -y git rsync && rm -rf /var/lib/apt/lists/*
 
 # Clone world repository
 RUN git clone https://github.com/Mega-Zinyz/Minecraft-World /tmp/world && \
@@ -65,6 +65,4 @@ RUN chmod +x /data/scripts/backup_script.sh
 RUN chown 1000:1000 /data/scripts/backup_script.sh
 
 # **Fix backup issue - Prevent looping**
-
-# Start socat to forward UDP to TCP before starting Minecraft server
-CMD socat TCP4-LISTEN:25565,fork UDP:127.0.0.1:24454 & exec /start
+ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh && exec /start"]
