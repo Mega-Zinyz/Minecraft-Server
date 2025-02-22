@@ -37,11 +37,17 @@ RUN mkdir -p /data/config/voicechat && \
     chmod 777 /data/config/voicechat/translations.properties && \
     chown 1000:1000 /data/config/voicechat/voicechat-server.properties /data/config/voicechat/translations.properties
 
-# **Fix the voice chat port**
+# Copy updated voicechat-server.properties file
+COPY config/voicechat/voicechat-server.properties /data/config/voicechat/voicechat-server.properties
+
+# Debugging: Check contents of voicechat-server.properties after copy
+RUN cat /data/config/voicechat/voicechat-server.properties
+
+# Fix the voice chat port in the properties file
 RUN sed -i 's/^port=.*$/port=25565/' /data/config/voicechat/voicechat-server.properties
 
-# Debugging: Check if the port change is successful
-RUN cat /data/config/voicechat/voicechat-server.properties
+# Debugging: Verify the port change
+RUN cat /data/config/voicechat/voicechat-server.properties  # Verify port change
 
 # Configure server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
