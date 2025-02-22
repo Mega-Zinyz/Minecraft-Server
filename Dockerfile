@@ -1,41 +1,34 @@
 # Gunakan itzg/minecraft-server sebagai base image
 FROM itzg/minecraft-server
 
-# Install Git
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# Install Git dan Rsync
+RUN apt-get update && apt-get install -y git rsync && rm -rf /var/lib/apt/lists/*
 
 # Clone world repository
 RUN git clone https://github.com/Mega-Zinyz/Minecraft-World /tmp/world && \
     rm -rf /tmp/world/.git && \
     mkdir -p /data/world && \
-    rsync -av /tmp/world/ /data/world/ || echo "World folder is empty, skipping..." && \
+    if [ -n "$(ls -A /tmp/world)" ]; then rsync -av /tmp/world/ /data/world/; fi && \
     chown -R 1000:1000 /data/world
 
 # Buat folder mods jika belum ada
-RUN mkdir -p /data/mods && chown -R 1000:1000 /data/mods
+RUN mkdir -p /data/mods /data/config /data/scripts
+RUN chown -R 1000:1000 /data
 
-# Copy Simple Voice Chat dan SkinsRestorer ke folder mods
+# Copy mods
 COPY --chown=1000:1000 plugins/skinrestorer-2.2.1+1.21-forge.jar /data/mods/
 COPY --chown=1000:1000 plugins/voicechat-forge-1.21.4-2.5.27.jar /data/mods/
 
-# Pastikan voicechat config dibuat dengan benar
-RUN mkdir -p /data/config && \
-    echo "allow-insecure-mode=true" > /data/config/voicechat-server.properties && \
+# Pastikan permissions benar
+RUN find /data/mods -type f -name "*.jar" -exec chmod 644 {} \;
+RUN chmod 644 /data/server.properties
+RUN chmod -R 755 /data/config
+RUN chown -R 1000:1000 /data/config
+
+# Konfigurasi voicechat
+RUN echo "allow-insecure-mode=true" > /data/config/voicechat-server.properties && \
     echo "use-experimental-udp-proxy=true" >> /data/config/voicechat-server.properties && \
     echo "udp-proxy-port=24454" >> /data/config/voicechat-server.properties
-
-# Log isi folder mods untuk debugging
-RUN ls -lah /data/mods
-
-# Pastikan permissions benar (LEBIH AMAN)
-RUN chmod 644 /data/mods/*.jar
-
-# Pastikan server.properties bisa dibaca & ditulis oleh Minecraft server
-RUN touch /data/server.properties && chmod 644 /data/server.properties && chown 1000:1000 /data/server.properties
-
-# Pastikan folder data memiliki akses yang benar
-RUN mkdir -p /data/config && touch /data/config/fml.toml && chmod 644 /data/config/fml.toml
-RUN chown -R 1000:1000 /data/config && chmod -R 755 /data/config
 
 # Konfigurasi server.properties
 RUN echo 'enforce-secure-profile=false' >> /data/server.properties && \
@@ -54,12 +47,12 @@ ENV EULA=TRUE \
     VERSION=LATEST \
     SERVER_PORT_UDP=24454
 
-# Copy dan atur script backup
+# Copy backup script dan berikan izin eksekusi
 COPY backup_script.sh /data/scripts/backup_script.sh
 RUN chmod +x /data/scripts/backup_script.sh
 
-# Debugging: Cek izin file sebelum menjalankan server
-RUN ls -lah /data/config && ls -lah /data/
+# Debugging: Cek isi folder sebelum start
+RUN ls -lah /data/mods /data/config /data/
 
-# Jalankan server dengan backup script sebelum memulai Minecraft
-CMD ["sh", "-c", "/data/scripts/backup_script.sh & exec /start"]
+# Jalankan backup script sebelum server
+ENTRYPOINT ["/bin/sh", "-c", "/data/scripts/backup_script.sh & exec /start"]
